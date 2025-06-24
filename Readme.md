@@ -40,7 +40,7 @@ To compile the code yourself, some prerequesites are required. First, we use CMa
 - Qt (http://www.qt.io/)
 - libtiff (http://www.libtiff.org/)
 - libjpeg (http://libjpeg.sourceforge.net/)
-- OpenJPEG (http://www.openjpeg.org/)
+- OpenJPEG (http://www.openjpeg.org/) *(optional, for JPEG2000 support)*
 - DCMTK (http://dicom.offis.de/dcmtk.php.en)
 - SWIG (http://www.swig.org/) (only for Python wrapping of the IO library)
 - OpenSlide (http://openslide.org/)
@@ -54,3 +54,4 @@ Subsequently, fire up CMake, point it to a source and build directory and hit Co
 During configuration you will notice that several parts of ASAP can be built seperately (e.g. the viewer). To build this part, simply check the component and hit Configure again. The 'Package on install'-option will allow you to build a binary setup-package like the one provided on the Github-release page. On Windows this requires NSIS to be installed.
 
 After all the dependencies are resolved, hit Generate and CMake will create a Visual Studio Solution or makefile file which can be used to compile the source code.
+To disable building of JPEG2000 functionality, configure CMake with `-DUSE_JPEG2000=OFF` (default).

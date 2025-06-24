@@ -34,8 +34,11 @@ if(WIN32)
 	add_definitions(${DEFAULT_COMPILE_DEFINITIONS})
 endif()
 
-# OpenJPEG for JPEG2000 codec
-find_package(OpenJPEG REQUIRED)
+# Optional JPEG2000 support via OpenJPEG
+option(USE_JPEG2000 "Enable JPEG2000 codec" OFF)
+if(USE_JPEG2000)
+  find_package(OpenJPEG REQUIRED)
+endif()
 
 # TIFF is the main multi-tiled format used in this package
 find_package(TIFF REQUIRED)
