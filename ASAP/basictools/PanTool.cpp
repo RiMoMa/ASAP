@@ -31,7 +31,12 @@ QAction* PanTool::getToolButton() {
   if (!_button) {
     _button = new QAction("Pan", this);
     _button->setObjectName(QString::fromStdString(name()));
-    if (QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    const bool dark = QApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+#else
+    const bool dark = false;
+#endif
+    if (dark) {
         _button->setIcon(QIcon(QPixmap(":/basictools_icons/pan_dark.png")));
     }
     else {
