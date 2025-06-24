@@ -18,15 +18,14 @@ ASAP is an open source platform for visualizing, annotating and automatically an
 
 #### Automatic annotation script
 
-The `scripts` folder contains utilities for automatic segmentation with the
-Segment Anything Model.  `process_svs_and_generate_annotations.py` can iterate
-over all `.svs` files in a directory and generate XML annotations, while
-`detect_glands_fov.py` runs the same model on a single region specified by
-coordinates. Parameters such as the SAM checkpoint and downsampling factor can
-be configured in `scripts/config.json`.
-Running `detect_glands_fov.py` with `--show` opens a simple viewer so
-annotations from successive fields of view accumulate visually while the XML
-file is updated after each run.
+The `scripts` folder contains utilities for automatic segmentation with either
+the Segment Anything Model or a UNet. `process_svs_and_generate_annotations.py`
+iterates over all `.svs` files in a directory using SAM. `detect_glands_fov.py`
+applies SAM on a single region, while `detect_glands_unet_fov.py` does the same
+using a UNet model. Parameters such as the checkpoints and postprocessing
+settings can be configured in `scripts/config.json`. Running the FOV scripts
+with `--show` opens a viewer so annotations from successive fields of view
+accumulate visually while the XML file is updated after each run.
 
 #### Installation
 

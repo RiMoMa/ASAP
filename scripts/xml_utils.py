@@ -60,3 +60,17 @@ def read_xml_annotations(path: str) -> List[Dict]:
         anns.append({'coords': coords, 'class': node.get('PartOfGroup', 'gland')})
     return anns
 
+
+from shapely.geometry import Polygon
+from shapely.validation import make_valid
+
+
+def simplify_polygon(vertices, tolerance=5.0):
+    """Return simplified polygon coordinates using the given tolerance."""
+    poly = Polygon(vertices)
+    simplified = poly.simplify(tolerance, preserve_topology=True)
+    if not simplified.is_valid:
+        simplified = make_valid(simplified)
+    if isinstance(simplified, Polygon):
+        return list(simplified.exterior.coords)
+    return []

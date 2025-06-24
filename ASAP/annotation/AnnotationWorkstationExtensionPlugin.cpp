@@ -18,6 +18,7 @@
 #include "MeasurementAnnotationTool.h"
 #include "PointSetQtAnnotation.h"
 #include "GlandDetectionTool.h"
+#include "UnetDetectionTool.h"
 #include "multiresolutionimageinterface/MultiResolutionImage.h"
 #include "../PathologyViewer.h"
 #include <QtUiTools>
@@ -756,6 +757,8 @@ bool AnnotationWorkstationExtensionPlugin::initialize(PathologyViewer* viewer) {
   tool.reset(new MeasurementAnnotationTool(this, viewer));
   _annotationTools.push_back(tool);
   tool.reset(new GlandDetectionTool(this, viewer));
+  _annotationTools.push_back(tool);
+  tool.reset(new UnetDetectionTool(this, viewer));
   _annotationTools.push_back(tool);
   _annotationService.reset(new AnnotationService());
   return true;

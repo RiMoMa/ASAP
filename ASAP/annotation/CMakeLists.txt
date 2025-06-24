@@ -17,6 +17,7 @@ SET(ANNOTATION_PLUGIN_HEADERS
     PointSetQtAnnotation.h
     DotQtAnnotation.h
     GlandDetectionTool.h
+    UnetDetectionTool.h
 )
 
 SET(ANNOTATION_PLUGIN_SOURCE
@@ -35,6 +36,7 @@ SET(ANNOTATION_PLUGIN_SOURCE
     PointSetQtAnnotation.cpp
     DotQtAnnotation.cpp
     GlandDetectionTool.cpp
+    UnetDetectionTool.cpp
 )
 
 set(ANNOTATION_WORKSTATION_EXTENSION_RESOURCE
