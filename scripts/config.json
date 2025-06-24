@@ -4,10 +4,12 @@
   "sam_checkpoint": "sam_vit_h.pth",
   "model_type": "vit_h",
   "unet_checkpoint": "unet.pth",
+  "unet_encoder": "resnet18",
   "device": "cuda:0",
   "downsample": 32,
   "min_area": 400,
   "max_area": 5000,
   "min_circularity": 0.8,
-  "simplify_tolerance": 10.0
+  "simplify_tolerance": 10.0,
+  "postprocess_min_size": 500
 }

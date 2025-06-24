@@ -22,8 +22,8 @@ The `scripts` folder contains utilities for automatic segmentation with either
 the Segment Anything Model or a UNet. `process_svs_and_generate_annotations.py`
 iterates over all `.svs` files in a directory using SAM. `detect_glands_fov.py`
 applies SAM on a single region, while `detect_glands_unet_fov.py` does the same
-using a UNet model. Parameters such as the checkpoints and postprocessing
-settings can be configured in `scripts/config.json`. Running the FOV scripts
+using a UNet model. Parameters such as the checkpoints, encoder choice and
+postprocessing settings can be configured in `scripts/config.json`. Running the FOV scripts
 with `--show` opens a viewer so annotations from successive fields of view
 accumulate visually while the XML file is updated after each run.
 
