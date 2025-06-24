@@ -1,6 +1,10 @@
 #ifndef _JPEG2000Codec
 #define _JPEG2000Codec
-#include "jpeg2kcodec_export.h"
+#ifdef USE_JPEG2000
+#  include "jpeg2kcodec_export.h"
+#else
+#  define JPEG2KCODEC_EXPORT
+#endif
 
 namespace pathology {
   enum class DataType;
