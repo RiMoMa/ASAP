@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QStyleHints>
 #include <QProcess>
+#include <QDebug>
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -79,9 +80,15 @@ void GlandDetectionTool::runDetection()
          << "--stdout";
 
     QProcess proc;
+    proc.setProcessChannelMode(QProcess::MergedChannels);
+    qDebug() << "Running" << "python3" << args.join(' ');
     proc.start("python3", args);
-    proc.waitForFinished(-1);
-    QByteArray output = proc.readAllStandardOutput();
+    if (!proc.waitForFinished(-1)) {
+        qWarning() << "Gland detection script failed:" << proc.errorString();
+        return;
+    }
+    QByteArray output = proc.readAll();
+    qDebug().noquote() << output;
     QJsonDocument doc = QJsonDocument::fromJson(output);
     if (!doc.isArray())
         return;

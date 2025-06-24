@@ -109,7 +109,8 @@ def run_fov_detection(
         existing = read_xml_annotations(out_path)
         all_annotations = existing + new_annotations
         generate_xml_annotations(all_annotations, out_path)
-        print(f"Saved annotations to {out_path}")
+        if not stdout:
+            print(f"Saved annotations to {out_path}")
 
     if stdout:
         import json
