@@ -16,6 +16,18 @@ ASAP is an open source platform for visualizing, annotating and automatically an
 - Viewer and reading library can easily be extended by implementing plugins using one of the four interface (tools, filters, extensions, fileformats)
 - Integration of on-the-fly image processing while viewing (current examples include color deconvolution and nuclei detection)
 
+#### Automatic annotation script
+
+The `scripts` folder contains utilities for automatic segmentation with the
+Segment Anything Model.  `process_svs_and_generate_annotations.py` can iterate
+over all `.svs` files in a directory and generate XML annotations, while
+`detect_glands_fov.py` runs the same model on a single region specified by
+coordinates. Parameters such as the SAM checkpoint and downsampling factor can
+be configured in `scripts/config.json`.
+Running `detect_glands_fov.py` with `--show` opens a simple viewer so
+annotations from successive fields of view accumulate visually while the XML
+file is updated after each run.
+
 #### Installation
 
 Currently ASAP is only supported under 64-bit Windows and Linux machines. There is preliminary support for MacOS, provided by contributors. Compilation on other architectures should be relatively straightforward as no OS-specific libraries or headers are used. The easiest way to install the software is to download the binary installer or .DEB package from the release page. **If you install the DEB package, you can find the ASAP executable under /opt/ASAP/bin**.

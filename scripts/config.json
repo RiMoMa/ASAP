@@ -1,0 +1,8 @@
+{
+  "input_path": "./slides",
+  "output_path": "./annotations",
+  "sam_checkpoint": "sam_vit_h.pth",
+  "model_type": "vit_h",
+  "device": "cuda:0",
+  "downsample": 32
+}
