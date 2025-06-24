@@ -14,8 +14,13 @@ namespace pathology {
 class JPEG2KCODEC_EXPORT JPEG2000Codec
 {
 public:
+#ifdef USE_JPEG2000
   JPEG2000Codec();
   ~JPEG2000Codec();
+#else
+  inline JPEG2000Codec() {}
+  inline ~JPEG2000Codec() = default;
+#endif
 
 #ifdef USE_JPEG2000
   void encode(char* data, unsigned int& size, const unsigned int& tileSize, const unsigned int& rate, const unsigned int& nrComponents, const pathology::DataType& dataType, const pathology::ColorType& colorSpace) const;
