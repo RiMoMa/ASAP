@@ -34,9 +34,42 @@ def load_config(path: str) -> Dict:
         return json.load(fh)
 
 
-def extract_patch(slide: openslide.OpenSlide, x: int, y: int, width: int, height: int, level: int = 0) -> np.ndarray:
-    region = slide.read_region((x, y), level, (width, height)).convert("RGB")
-    return np.array(region)
+def extract_patch(
+    slide: openslide.OpenSlide,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+    downscale: int = 1,
+) -> Tuple[np.ndarray, float]:
+    """Extract a region and optionally downscale it.
+
+    Parameters
+    ----------
+    slide : OpenSlide
+        The slide from which to read.
+    x, y, width, height : int
+        Coordinates and size in level 0 reference frame.
+    downscale : int, optional
+        Factor by which the patch should be downscaled. ``1`` means no scaling.
+
+    Returns
+    -------
+    image : ndarray
+        RGB patch downscaled by ``downscale``.
+    float
+        The scale factor applied so coordinates can be mapped back.
+    """
+
+    region = slide.read_region((x, y), 0, (width, height)).convert("RGB")
+    img = np.array(region)
+    if downscale > 1:
+        from PIL import Image
+
+        new_w = max(1, width // downscale)
+        new_h = max(1, height // downscale)
+        img = np.array(Image.fromarray(img).resize((new_w, new_h), Image.BILINEAR))
+    return img, float(downscale)
 
 
 def masks_to_annotations(masks: List[Dict], factor: float, offset: Tuple[int, int]) -> List[Dict]:
@@ -53,14 +86,21 @@ def masks_to_annotations(masks: List[Dict], factor: float, offset: Tuple[int, in
     return annotations
 
 
-def show_patch(image: np.ndarray, annotations: List[Dict], origin: Tuple[int, int]) -> None:
+def show_patch(
+    image: np.ndarray,
+    annotations: List[Dict],
+    origin: Tuple[int, int],
+    scale: float = 1.0,
+) -> None:
     """Display a patch with annotation overlays using matplotlib."""
     import matplotlib.pyplot as plt
 
     ox, oy = origin
     plt.imshow(image)
     for ann in annotations:
-        pts = np.array([(x - ox, y - oy) for x, y in ann.get("coords", [])])
+        pts = np.array(
+            [((x - ox) / scale, (y - oy) / scale) for x, y in ann.get("coords", [])]
+        )
         if len(pts) > 0:
             plt.plot(pts[:, 0], pts[:, 1], "r")
     plt.axis("off")
@@ -91,8 +131,8 @@ def run_fov_detection(
     slide = openslide.OpenSlide(slide_path)
     x, y, w, h = coords
 
-    image = extract_patch(slide, x, y, w, h, level=0)
-    factor = 1.0
+    # Downscale by factor 4 to reduce GPU memory usage
+    image, factor = extract_patch(slide, x, y, w, h, downscale=4)
 
     sam = sam_model_registry[cfg.get("model_type", "vit_h")](
         checkpoint=cfg["sam_checkpoint"],
@@ -118,7 +158,7 @@ def run_fov_detection(
 
     if show:
         relevant = annotations_in_region(all_annotations, (x, y, w, h))
-        show_patch(image, relevant, (x, y))
+        show_patch(image, relevant, (x, y), scale=factor)
 
 
 def parse_args() -> argparse.Namespace:
