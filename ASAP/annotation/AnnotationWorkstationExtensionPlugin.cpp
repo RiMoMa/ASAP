@@ -17,6 +17,7 @@
 #include "RectangleAnnotationTool.h"
 #include "MeasurementAnnotationTool.h"
 #include "PointSetQtAnnotation.h"
+#include "GlandDetectionTool.h"
 #include "multiresolutionimageinterface/MultiResolutionImage.h"
 #include "../PathologyViewer.h"
 #include <QtUiTools>
@@ -754,6 +755,8 @@ bool AnnotationWorkstationExtensionPlugin::initialize(PathologyViewer* viewer) {
   _annotationTools.push_back(tool);
   tool.reset(new MeasurementAnnotationTool(this, viewer));
   _annotationTools.push_back(tool);
+  tool.reset(new GlandDetectionTool(this, viewer));
+  _annotationTools.push_back(tool);
   _annotationService.reset(new AnnotationService());
   return true;
 }
@@ -968,6 +971,49 @@ void AnnotationWorkstationExtensionPlugin::removeAnnotationFromSelection(QtAnnot
     }
     ++it;
   }
+}
+
+void AnnotationWorkstationExtensionPlugin::addPolygonAnnotation(const std::vector<Point>& coords, const std::string& name)
+{
+  if (!_viewer || !_annotationService || !_treeWidget)
+    return;
+
+  std::shared_ptr<Annotation> annot = std::make_shared<Annotation>();
+  annot->setType(Annotation::Type::POLYGON);
+  for (const Point& p : coords) {
+    annot->addCoordinate(p.getX(), p.getY());
+  }
+  if (!name.empty()) {
+    annot->setName(name);
+  } else {
+    annot->setName("Annotation " + std::to_string(_annotationIndex));
+  }
+  _annotationIndex += 1;
+
+  PolyQtAnnotation* qAnnot = new PolyQtAnnotation(annot, this, _viewer->getSceneScale());
+  qAnnot->setInterpolationType("linear");
+  qAnnot->finish();
+  _qtAnnotations.append(qAnnot);
+  _annotationService->getList()->addAnnotation(annot);
+  _viewer->scene()->addItem(qAnnot);
+  qAnnot->setZValue(20.);
+
+  QTreeWidgetItem* newItem = new QTreeWidgetItem(_treeWidget);
+  newItem->setText(1, QString::fromStdString(annot->getName()));
+  newItem->setText(2, QString::fromStdString(annot->getTypeAsString()));
+  newItem->setFlags(newItem->flags() & ~Qt::ItemIsDropEnabled);
+  newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
+  newItem->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotation*>(qAnnot));
+  int cHeight = _treeWidget->visualItemRect(newItem).height();
+  QPixmap iconPM(cHeight, cHeight);
+  iconPM.fill(QColor("yellow"));
+  QIcon color(iconPM);
+  newItem->setIcon(0, color);
+  newItem->setData(0, Qt::UserRole, QColor("#F4FA58"));
+  annot->setColor("#F4FA58");
+  _annotToItem[qAnnot] = newItem;
+  _treeWidget->resizeColumnToContents(0);
+  _treeWidget->resizeColumnToContents(1);
 }
 
 QSet<QtAnnotation*> AnnotationWorkstationExtensionPlugin::getSelectedAnnotations() {

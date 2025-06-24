@@ -9,6 +9,8 @@ Example:
 
     python detect_glands_fov.py slide.svs --x 1000 --y 2000 --width 512 \
         --height 512 --out results.xml
+    # or to print annotations as JSON
+    python detect_glands_fov.py slide.svs --x 0 --y 0 --width 512 --height 512 --stdout
 """
 from __future__ import annotations
 
@@ -82,8 +84,9 @@ def run_fov_detection(
     cfg: Dict,
     slide_path: str,
     coords: Tuple[int, int, int, int],
-    out_path: str,
+    out_path: str | None,
     show: bool = False,
+    stdout: bool = False,
 ) -> None:
     slide = openslide.OpenSlide(slide_path)
     x, y, w, h = coords
@@ -101,10 +104,16 @@ def run_fov_detection(
         masks = mask_generator.generate(image)
 
     new_annotations = masks_to_annotations(masks, factor, (x, y))
-    existing = read_xml_annotations(out_path)
-    all_annotations = existing + new_annotations
-    generate_xml_annotations(all_annotations, out_path)
-    print(f"Saved annotations to {out_path}")
+    all_annotations = new_annotations
+    if out_path:
+        existing = read_xml_annotations(out_path)
+        all_annotations = existing + new_annotations
+        generate_xml_annotations(all_annotations, out_path)
+        print(f"Saved annotations to {out_path}")
+
+    if stdout:
+        import json
+        print(json.dumps(new_annotations))
 
     if show:
         relevant = annotations_in_region(all_annotations, (x, y, w, h))
@@ -118,8 +127,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--y", type=int, required=True, help="Top-left Y coordinate")
     p.add_argument("--width", type=int, required=True, help="Patch width")
     p.add_argument("--height", type=int, required=True, help="Patch height")
-    p.add_argument("--out", required=True, help="Output XML path")
+    p.add_argument("--out", help="Output XML path")
     p.add_argument("--show", action="store_true", help="Display patch with overlays")
+    p.add_argument("--stdout", action="store_true", help="Print annotations as JSON")
     return p.parse_args()
 
 
@@ -133,6 +143,7 @@ def main() -> None:
         (args.x, args.y, args.width, args.height),
         args.out,
         show=args.show,
+        stdout=args.stdout,
     )
 
 

@@ -6,6 +6,7 @@
 #include <memory>
 #include <QString>
 #include <QMap>
+#include "core/Point.h"
 
 class AnnotationService;
 class QtAnnotation;
@@ -42,6 +43,7 @@ public :
     void deleteAnnotation(QtAnnotation* annotation);
     void deleteAnnotationGroup(QtAnnotationGroup* group);
     std::weak_ptr<MultiResolutionImage> getCurrentImage();
+    void addPolygonAnnotation(const std::vector<Point>& coords, const std::string& name = std::string());
     void clearSelection();
     bool canClose();
 
