@@ -304,7 +304,14 @@ void* WSIDicomInstance::getFrame(const long long& x, const long long& y, const l
     }
     else {
         Uint32 bufferSize;
+        // DCMTK 3.6.7 added a third argument 'forceOld'. Pass OFFalse when
+        // available while remaining compatible with older versions where
+        // the argument does not exist.
+#if DCMTK_VERSION_NUMBER >= 363
+        _pixels->getUncompressedFrameSize(_dataset, bufferSize, OFFalse);
+#else
         _pixels->getUncompressedFrameSize(_dataset, bufferSize);
+#endif
         buffer = new unsigned char[bufferSize];
         std::fill(buffer, buffer + bufferSize, 0);
 
