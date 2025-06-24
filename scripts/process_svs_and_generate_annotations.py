@@ -25,7 +25,6 @@ import os
 from typing import List, Tuple, Dict
 
 import numpy as np
-from PIL import Image
 import openslide
 from tqdm import tqdm
 from skimage.measure import find_contours

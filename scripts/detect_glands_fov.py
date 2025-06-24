@@ -18,7 +18,6 @@ import os
 from typing import List, Dict, Tuple
 
 import numpy as np
-from PIL import Image
 import openslide
 from skimage.measure import find_contours
 

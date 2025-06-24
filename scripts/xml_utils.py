@@ -1,6 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
-from typing import List, Dict, Tuple
+from typing import List, Dict
 
 def generate_xml_annotations(annotations: List[Dict], output_path: str) -> None:
     """Generate an ASAP compatible XML file from annotations.
