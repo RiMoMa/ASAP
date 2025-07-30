@@ -54,8 +54,8 @@ def read_xml_annotations(path: str) -> List[Dict]:
         if coord_node is None:
             continue
         for c in coord_node.findall('Coordinate'):
-            x = float(c.get('X', '0'))
-            y = float(c.get('Y', '0'))
+            x = float(c.get('X', '0').replace(",", "."))
+            y = float(c.get('Y', '0').replace(",", "."))
             coords.append((x, y))
         anns.append({'coords': coords, 'class': node.get('PartOfGroup', 'gland')})
     return anns

@@ -45,6 +45,8 @@ def extract_patch(
         new_w = max(1, width // downscale)
         new_h = max(1, height // downscale)
         img = np.array(Image.fromarray(img).resize((new_w, new_h), Image.BILINEAR))
+        #img = np.array(Image.fromarray(img).resize((512,512), Image.BILINEAR))
+        
     return img, float(downscale)
 
 
@@ -94,13 +96,29 @@ def postprocess_mask(
 
 def predict_mask(model: torch.nn.Module, img: np.ndarray, device: str, cfg: Dict) -> np.ndarray:
     """Return a binary mask from UNet prediction."""
+    
+    # Normaliza la imagen a [0, 1]
     img_norm = min_max_norm(img)
+    
+    # Prepara el tensor de entrada: (H, W, C) -> (1, C, H, W)
     with torch.no_grad():
         tensor = torch.from_numpy(img_norm.transpose(2, 0, 1)).unsqueeze(0).float().to(device)
-        pred = torch.sigmoid(model(tensor)).cpu().numpy()[0, 0]
-    mask = postprocess_mask(pred, min_size=cfg.get("postprocess_min_size", 500))
-    binary_mask = (mask > 0).astype(int)
+        
+        # Predicción con el modelo UNet
+        pred = torch.sigmoid(model(tensor)).cpu().numpy()[0, 0]  # (H, W)
+
+        # Umbralización (predicciones > 0.66 se consideran positivas)
+        pred_binary = np.where(pred > 0.5, 1.0, 0.0).astype(np.uint8)  # (H, W)
+
+    # Postprocesamiento (aplica operaciones morfológicas, eliminación de objetos pequeños, etc.)
+    mask = postprocess_mask(pred_binary, min_size=cfg.get("postprocess_min_size", 500))  # (H, W)
+
+    # Asegura que la salida sea una máscara binaria (0 o 1)
+    binary_mask = (mask > 0).astype(np.uint8)
+
+
     return binary_mask
+
 
 
 def create_binary_mask(anns: List[Dict], min_area: int, max_area: int, min_circ: float) -> np.ndarray:
@@ -137,6 +155,8 @@ def masks_to_annotations(
         if len(pts) >= 3:
             annotations.append({"coords": pts, "class": "gland"})
     return annotations
+    
+  
 
 
 def show_patch(image: np.ndarray, annotations: List[Dict], origin: Tuple[int, int], scale: float = 1.0) -> None:
@@ -151,7 +171,7 @@ def show_patch(image: np.ndarray, annotations: List[Dict], origin: Tuple[int, in
             plt.plot(pts[:, 0], pts[:, 1], "r")
     plt.axis("off")
     plt.show(block=False)
-    plt.pause(0.001)
+    plt.pause(0.01)
 
 
 def annotations_in_region(annotations: List[Dict], region: Tuple[int, int, int, int]) -> List[Dict]:
@@ -182,11 +202,10 @@ def run_detection(
     device = cfg.get("device", "cpu")
     model = load_unet(cfg["unet_checkpoint"], cfg.get("unet_encoder", "resnet18"), device)
     mask = predict_mask(model, image, device, cfg)
-    ann_mask = create_binary_mask([
-        {"segmentation": mask, "area": int(mask.sum())}
-    ], cfg.get("min_area", 400), cfg.get("max_area", 5000), cfg.get("min_circularity", 0.8))
-    new_annotations = masks_to_annotations(ann_mask, factor, (x, y), cfg.get("simplify_tolerance", 5.0))
+
+    new_annotations = masks_to_annotations(mask>0, factor, (x, y), cfg.get("simplify_tolerance", 5.0))
     all_annotations = new_annotations
+
     if out_path:
         existing = read_xml_annotations(out_path)
         all_annotations = existing + new_annotations
