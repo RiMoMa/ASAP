@@ -58,6 +58,9 @@ public :
 
   //! Get the file type of the opened image
   const std::string getFileType() const;
+
+  //! Get the path of the opened image file
+  const std::string& getFilePath() const { return _filePath; }
   
   //! Obtains data as a patch, which is a basic image class containing all relevant information for further processing,
   //! like data and colortype

@@ -65,16 +65,22 @@ IF(APPLE)
 ENDIF(APPLE)
 
 
-add_library(jpeg2kcodec SHARED JPEG2000Codec.h JPEG2000Codec.cpp)
-generate_export_header(jpeg2kcodec)
-set_target_properties(jpeg2kcodec PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries(jpeg2kcodec openjp2)
-target_include_directories(jpeg2kcodec PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> $<INSTALL_INTERFACE:include/multiresolutionimageinterface> PRIVATE ${DIAGPathology_SOURCE_DIR} ${DIAGPathology_BINARY_DIR}/core ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+if(USE_JPEG2000)
+  add_library(jpeg2kcodec SHARED JPEG2000Codec.h JPEG2000Codec.cpp)
+  generate_export_header(jpeg2kcodec)
+  set_target_properties(jpeg2kcodec PROPERTIES DEBUG_POSTFIX _d)
+  target_link_libraries(jpeg2kcodec openjp2)
+  target_include_directories(jpeg2kcodec PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> $<INSTALL_INTERFACE:include/multiresolutionimageinterface> PRIVATE ${DIAGPathology_SOURCE_DIR} ${DIAGPathology_BINARY_DIR}/core ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 add_library(multiresolutionimageinterface SHARED ${MULTIRESOLUTIONIMAGEINTERFACE_SRCS} ${MULTIRESOLUTIONIMAGEINTERFACE_HS})
 
 target_include_directories(multiresolutionimageinterface PUBLIC $<BUILD_INTERFACE:${DIAGPathology_SOURCE_DIR}> $<INSTALL_INTERFACE:include> $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> $<INSTALL_INTERFACE:include/multiresolutionimageinterface> PRIVATE ${PugiXML_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
-target_link_libraries(multiresolutionimageinterface PUBLIC core PRIVATE jpeg2kcodec TIFF::TIFF JPEG::JPEG pugixml)
+target_link_libraries(multiresolutionimageinterface PUBLIC core PRIVATE TIFF::TIFF JPEG::JPEG pugixml)
+if(USE_JPEG2000)
+  target_link_libraries(multiresolutionimageinterface PRIVATE jpeg2kcodec)
+  target_compile_definitions(multiresolutionimageinterface PUBLIC USE_JPEG2000)
+endif()
 
 IF(NOT WIN32)
   target_link_libraries(multiresolutionimageinterface PRIVATE dl)
@@ -96,16 +102,22 @@ if(BUILD_MULTIRESOLUTIONIMAGEINTERFACE_DICOM_SUPPORT)
   target_include_directories(dicomfileformat PRIVATE ${DCMTK_INCLUDE_DIR})
   # Small workaround to support slightly older versions of DCMTK (such as in vcpkg)
   if(TARGET DCMTK::dcmdata)
-    target_link_libraries(dicomfileformat PUBLIC multiresolutionimageinterface PRIVATE core DCMTK::dcmjpeg DCMTK::dcmimage DCMTK::dcmdata jpeg2kcodec)
-  else(TARGET DCMTK::dcmdata)
-    target_link_libraries(dicomfileformat PUBLIC multiresolutionimageinterface PRIVATE core dcmjpeg dcmimage dcmdata jpeg2kcodec)
-  endif(TARGET DCMTK::dcmdata)
+    target_link_libraries(dicomfileformat PUBLIC multiresolutionimageinterface PRIVATE core DCMTK::dcmjpeg DCMTK::dcmimage DCMTK::dcmdata)
+  else()
+    target_link_libraries(dicomfileformat PUBLIC multiresolutionimageinterface PRIVATE core dcmjpeg dcmimage dcmdata)
+  endif()
+  if(USE_JPEG2000)
+    target_link_libraries(dicomfileformat PRIVATE jpeg2kcodec)
+    target_compile_definitions(dicomfileformat PUBLIC USE_JPEG2000)
+  endif()
   set_target_properties(dicomfileformat PROPERTIES DEBUG_POSTFIX _d)
 endif(BUILD_MULTIRESOLUTIONIMAGEINTERFACE_DICOM_SUPPORT)
 
-if(WIN32)  
-  set_target_properties(multiresolutionimageinterface PROPERTIES FOLDER multiresolutionimageinterface)    
-  set_target_properties(jpeg2kcodec PROPERTIES FOLDER multiresolutionimageinterface)    
+if(WIN32)
+  set_target_properties(multiresolutionimageinterface PROPERTIES FOLDER multiresolutionimageinterface)
+  if(USE_JPEG2000)
+    set_target_properties(jpeg2kcodec PROPERTIES FOLDER multiresolutionimageinterface)
+  endif()
   set_target_properties(openslidefileformat PROPERTIES FOLDER multiresolutionimageinterface)
   if(BUILD_MULTIRESOLUTIONIMAGEINTERFACE_DICOM_SUPPORT)
     set_target_properties(dicomfileformat PROPERTIES FOLDER multiresolutionimageinterface)
@@ -217,12 +229,14 @@ IF(APPLE)
     ARCHIVE DESTINATION ${INSTALL_RESOURCE_DIR}
   )
 
-  install(TARGETS jpeg2kcodec
-    EXPORT asap-targets
-    RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
-    LIBRARY DESTINATION ${INSTALL_RESOURCE_DIR}
-    ARCHIVE DESTINATION ${INSTALL_RESOURCE_DIR}
-  )
+  if(USE_JPEG2000)
+    install(TARGETS jpeg2kcodec
+      EXPORT asap-targets
+      RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
+      LIBRARY DESTINATION ${INSTALL_RESOURCE_DIR}
+      ARCHIVE DESTINATION ${INSTALL_RESOURCE_DIR}
+    )
+  endif()
 
   install(TARGETS openslidefileformat
     EXPORT asap-targets
@@ -250,12 +264,14 @@ ELSE(APPLE)
     ARCHIVE DESTINATION lib
   )
 
-  install(TARGETS jpeg2kcodec
-    EXPORT asap-targets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-  )
+  if(USE_JPEG2000)
+    install(TARGETS jpeg2kcodec
+      EXPORT asap-targets
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib
+    )
+  endif()
 
   install(TARGETS openslidefileformat
     EXPORT asap-targets

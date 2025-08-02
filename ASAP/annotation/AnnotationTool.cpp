@@ -111,6 +111,12 @@ void AnnotationTool::keyPressEvent(QKeyEvent *event) {
       }
     }
   }
+  else if (event->key() == Qt::Key::Key_D && event->modifiers() == Qt::ControlModifier) {
+    if (!_generating && _annotationPlugin->getActiveAnnotation()) {
+      _annotationPlugin->deleteAnnotation(_annotationPlugin->getActiveAnnotation());
+      event->accept();
+    }
+  }
 }
 
 void AnnotationTool::setActive(bool active) {

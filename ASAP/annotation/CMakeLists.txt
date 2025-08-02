@@ -16,6 +16,8 @@ SET(ANNOTATION_PLUGIN_HEADERS
     PolyQtAnnotation.h
     PointSetQtAnnotation.h
     DotQtAnnotation.h
+    GlandDetectionTool.h
+    UnetDetectionTool.h
 )
 
 SET(ANNOTATION_PLUGIN_SOURCE
@@ -33,6 +35,8 @@ SET(ANNOTATION_PLUGIN_SOURCE
     MeasurementQtAnnotation.cpp
     PointSetQtAnnotation.cpp
     DotQtAnnotation.cpp
+    GlandDetectionTool.cpp
+    UnetDetectionTool.cpp
 )
 
 set(ANNOTATION_WORKSTATION_EXTENSION_RESOURCE
@@ -43,6 +47,7 @@ add_library(AnnotationPlugin SHARED ${ANNOTATION_PLUGIN_SOURCE} ${ANNOTATION_PLU
 
 generate_export_header(AnnotationPlugin)
 target_link_libraries(AnnotationPlugin PUBLIC ASAPLib core PRIVATE multiresolutionimageinterface core annotation Qt6::Core Qt6::Widgets Qt6::UiTools)
+target_compile_definitions(AnnotationPlugin PRIVATE SCRIPTS_DIR="${PROJECT_SOURCE_DIR}/scripts")
 target_include_directories(AnnotationPlugin PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> $<INSTALL_INTERFACE:include/ASAP/plugins/workstationextension>)
 set_target_properties(AnnotationPlugin PROPERTIES DEBUG_POSTFIX _d)
 
