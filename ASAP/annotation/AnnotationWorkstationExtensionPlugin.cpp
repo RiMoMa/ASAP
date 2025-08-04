@@ -310,6 +310,11 @@ void AnnotationWorkstationExtensionPlugin::onTreeWidgetSelectedItemsChanged() {
       }
     }
   }
+
+  if (_activeAnnotation && _viewer) {
+    QRectF annotationSceneRect = _activeAnnotation->mapToScene(_activeAnnotation->boundingRect()).boundingRect();
+    _viewer->moveTo(annotationSceneRect.center());
+  }
 }
 
 bool AnnotationWorkstationExtensionPlugin::canClose() {
