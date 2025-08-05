@@ -47,7 +47,7 @@ add_library(AnnotationPlugin SHARED ${ANNOTATION_PLUGIN_SOURCE} ${ANNOTATION_PLU
 
 generate_export_header(AnnotationPlugin)
 target_link_libraries(AnnotationPlugin PUBLIC ASAPLib core PRIVATE multiresolutionimageinterface core annotation Qt6::Core Qt6::Widgets Qt6::UiTools)
-target_compile_definitions(AnnotationPlugin PRIVATE SCRIPTS_DIR="${PROJECT_SOURCE_DIR}/scripts")
+target_compile_definitions(AnnotationPlugin PRIVATE SCRIPTS_DIR="${SCRIPTS_DIR}") # ADDED
 target_include_directories(AnnotationPlugin PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> $<INSTALL_INTERFACE:include/ASAP/plugins/workstationextension>)
 set_target_properties(AnnotationPlugin PROPERTIES DEBUG_POSTFIX _d)
 

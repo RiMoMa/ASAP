@@ -13,6 +13,9 @@ configure_file(
   "${PROJECT_BINARY_DIR}/config/ASAPMacros.h"
 )
 
+set(SCRIPTS_DIR "/usr/share/asap/scripts" CACHE PATH "Directory for ASAP Python scripts") # ADDED
+add_compile_definitions(SCRIPTS_DIR="${SCRIPTS_DIR}") # ADDED
+
 set(CMAKE_MODULE_PATH ${DIAGPathology_SOURCE_DIR}/cmakemodules)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -119,6 +122,8 @@ install(FILES
  
 # Install the export set for use with the install-tree
 install(EXPORT asap-targets DESTINATION cmake)
+
+install(DIRECTORY scripts/ DESTINATION ${SCRIPTS_DIR} FILES_MATCHING PATTERN "*.py") # ADDED
 
 if(PACKAGE_ON_INSTALL)
   set(CPACK_PACKAGE_NAME "ASAP")

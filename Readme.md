@@ -47,6 +47,7 @@ To compile the code yourself, some prerequesites are required. First, we use CMa
 - zlib (http://www.zlib.net/)
 
 To help developers compile this software themselves we provide the necesarry binaries (Visual Studio 2019, 64-bit) for all third party libraries on Windows except OpenCV and Qt (due to size constraints). See the Release page for binaries. If you want to provide the packages yourself, there are no are no strict version requirements, except for libtiff (4.0.1 and higher), Qt (5.1 or higher) and OpenCV (3.1). On Linux all packages can be installed through the package manager on Ubuntu-derived systems (tested on Ubuntu and Kubuntu 18.04 LTS). You can also use the provided Dockerfile for Linux builds (under buildtools).
+An additional helper script `build_universal_package.sh` is available in the `buildtools` directory. It builds a portable TGZ package that can be used on most Linux distributions.
 
 Subsequently, fire up CMake, point it to a source and build directory and hit Configure. Select your compiler of preference and hit ok. This will start the iterative process of CMake trying to find a third party dependency and you specifiying its location. These should be pretty straightforward to fill in (e.g. TIFF\_LIBRRARY should point to tiff.lib, TIFF\_INCLUDE\_DIRECTORY to |folder to libtiff|\include. If more steps are unclear, please open a ticket on the Github issue-tracker.
 
