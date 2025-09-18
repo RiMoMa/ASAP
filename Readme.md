@@ -1,56 +1,153 @@
-# ASAP - Automated Slide Analysis Platform
+# ASAP – Fork with Gland Segmentation Wrappers and GUI Extensions
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gy0rv4vos88aiq53?svg=true)](https://ci.appveyor.com/project/GeertLitjens/asap)
+This repository is a fork of the original **ASAP (Automated Slide Analysis Platform)**, extended with new functionality to simplify **automatic segmentation of glands in whole-slide images (WSI)** using **AI models (SAM and U-Net)**.
 
-ASAP is an open source platform for visualizing, annotating and automatically analyzing whole-slide histopathology images. It consists of several key-components (slide input/output, image processing, viewer) which can be used seperately. It is built on top of several well-developed open source packages like OpenSlide, Qt and OpenCV but also tries to extend them in several meaningful ways.
+👉 Original repo: [computationalpathologygroup/ASAP](https://github.com/computationalpathologygroup/ASAP)  
+👉 This fork: [RiMoMa/ASAP](https://github.com/RiMoMa/ASAP)
 
-#### Features
+---
 
-- Reading of scanned whole-slide images from several different vendors (Aperio, Ventana, Hamamatsu, Olympus, support for fluorescence images in Leica LIF format)
-- Writing of generic multi-resolution tiled TIFF files for ARGB, RGB, Indexed and monochrome images (including support for different data types like float)
-- Python wrapping of the IO library for access to multi-resolution images through Numpy array's
-- Basic image primitives (Patch) which can be fed to image processing filters, connection to OpenCV
-- Qt-based viewer to visualize whole-slide images in a fast, fluid manner
-- Point, polygonal and spline annotation tools to allow annotation of whole slide images.
-- Annotation storage in simple, human-readable XML for easy use in other software
-- Viewer and reading library can easily be extended by implementing plugins using one of the four interface (tools, filters, extensions, fileformats)
-- Integration of on-the-fly image processing while viewing (current examples include color deconvolution and nuclei detection)
+## ✨ Key contributions in this fork
 
-#### Automatic annotation script
+- **Two new buttons added to the GUI**:
+  - Run automatic segmentation on the current WSI.  
+  - Save results directly into ASAP-compatible `.xml` annotations.  
 
-The `scripts` folder contains utilities for automatic segmentation with either
-the Segment Anything Model or a UNet. `process_svs_and_generate_annotations.py`
-iterates over all `.svs` files in a directory using SAM. `detect_glands_fov.py`
-applies SAM on a single region, while `detect_glands_unet_fov.py` does the same
-using a UNet model. Parameters such as the checkpoints, encoder choice and
-postprocessing settings can be configured in `scripts/config.json`. Running the FOV scripts
-with `--show` opens a viewer so annotations from successive fields of view
-accumulate visually while the XML file is updated after each run.
+- **Python wrappers for AI models**:
+  - `process_svs_and_generate_annotations.py`: batch segmentation of all `.svs` slides in a directory using **Segment Anything (SAM)**.  
+  - `detect_glands_fov.py`: apply **SAM** on a single field of view (FOV).  
+  - `detect_glands_unet_fov.py`: apply **U-Net** on a single FOV.  
 
-#### Installation
+- **Centralized configuration** via `scripts/config.json`:
+  - Model checkpoints, encoder choice, tiling, thresholds, and postprocessing can be easily adjusted.  
 
-Currently ASAP is only supported under 64-bit Windows and Linux machines. There is preliminary support for MacOS, provided by contributors. Compilation on other architectures should be relatively straightforward as no OS-specific libraries or headers are used. The easiest way to install the software is to download the binary installer or .DEB package from the release page. **If you install the DEB package, you can find the ASAP executable under /opt/ASAP/bin**.
+- **ASAP XML integration**:
+  - Segmentation results are stored as ASAP-readable `.xml` files.  
+  - With `--show`, annotations accumulate visually in the viewer while the XML is updated after each run.  
 
-#### Compilation
+---
 
-To compile the code yourself, some prerequesites are required. First, we use CMake (version >= 3.5) as our build system and Microsoft Visual Studio or GCC as the compiler. Your compiler needs to support Cx17 features. The software depends on numerous third-party libraries:
+## ⚙️ Build Instructions (Linux)
 
-- OpenCV (http://www.opencv.org/)
-- Qt (http://www.qt.io/)
-- libtiff (http://www.libtiff.org/)
-- libjpeg (http://libjpeg.sourceforge.net/)
-- OpenJPEG (http://www.openjpeg.org/) *(optional, for JPEG2000 support)*
-- DCMTK (http://dicom.offis.de/dcmtk.php.en)
-- SWIG (http://www.swig.org/) (only for Python wrapping of the IO library)
-- OpenSlide (http://openslide.org/)
-- PugiXML (http://pugixml.org/)
-- zlib (http://www.zlib.net/)
+This fork was tested with **Ubuntu 20.04+** and **OpenSlide**.
 
-To help developers compile this software themselves we provide the necesarry binaries (Visual Studio 2019, 64-bit) for all third party libraries on Windows except OpenCV and Qt (due to size constraints). See the Release page for binaries. If you want to provide the packages yourself, there are no are no strict version requirements, except for libtiff (4.0.1 and higher), Qt (5.1 or higher) and OpenCV (3.1). On Linux all packages can be installed through the package manager on Ubuntu-derived systems (tested on Ubuntu and Kubuntu 18.04 LTS). You can also use the provided Dockerfile for Linux builds (under buildtools).
+```bash
+mkdir build && cd build
 
-Subsequently, fire up CMake, point it to a source and build directory and hit Configure. Select your compiler of preference and hit ok. This will start the iterative process of CMake trying to find a third party dependency and you specifiying its location. These should be pretty straightforward to fill in (e.g. TIFF\_LIBRRARY should point to tiff.lib, TIFF\_INCLUDE\_DIRECTORY to |folder to libtiff|\include. If more steps are unclear, please open a ticket on the Github issue-tracker.
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DUSE_JPEG2000=OFF \
+  -DBUILD_MULTIRESOLUTIONIMAGEINTERFACE_DICOM_SUPPORT=OFF \
+  -DOPENSLIDE_INCLUDE_DIR=/usr/include/openslide \
+  -DOPENSLIDE_LIBRARIES=/usr/lib/x86_64-linux-gnu/libopenslide.so \
+  -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE \
+  -DBUILD_ASAP=ON
 
-During configuration you will notice that several parts of ASAP can be built seperately (e.g. the viewer). To build this part, simply check the component and hit Configure again. The 'Package on install'-option will allow you to build a binary setup-package like the one provided on the Github-release page. On Windows this requires NSIS to be installed.
+make -j"$(nproc)"
+sudo make install
+```
 
-After all the dependencies are resolved, hit Generate and CMake will create a Visual Studio Solution or makefile file which can be used to compile the source code.
-To disable building of JPEG2000 functionality, configure CMake with `-DUSE_JPEG2000=OFF` (default).
+> The binary will be available as `ASAP`. On `.deb` installations, it is usually located under `/opt/ASAP/bin`.
+
+---
+
+## 🚀 Usage of the Wrappers
+
+### 1. Configure `scripts/config.json`
+
+Example snippet:
+
+```json
+{
+  "model": "sam",
+  "sam_checkpoint": "/path/to/sam_vit_h.pth",
+  "unet_checkpoint": "/path/to/unet_glands.ckpt",
+  "encoder": "resnet34",
+  "postprocess": { "min_area": 200, "smooth_kernel": 3 },
+  "tiling": { "patch_size": 1024, "overlap": 128 },
+  "output": { "xml_dir": "./annotations", "format": "asap-xml" }
+}
+```
+
+---
+
+### 2. Process a folder of `.svs` files with SAM
+
+```bash
+python scripts/process_svs_and_generate_annotations.py \
+  --input_dir /path/to/WSI \
+  --config scripts/config.json \
+  --output_dir ./annotations
+```
+
+---
+
+### 3. Apply SAM on a single field of view (interactive)
+
+```bash
+python scripts/detect_glands_fov.py \
+  --slide /path/to/case.svs \
+  --x 10000 --y 12000 --w 4096 --h 4096 \
+  --config scripts/config.json \
+  --show
+```
+
+---
+
+### 4. Apply U-Net on a single field of view
+
+```bash
+python scripts/detect_glands_unet_fov.py \
+  --slide /path/to/case.svs \
+  --x 5000 --y 5000 --w 4096 --h 4096 \
+  --config scripts/config.json
+```
+
+---
+
+## 🖼️ Screenshots / Examples
+
+
+```markdown
+![New GUI buttons](docs/img/gui_buttons.png)
+*Two new buttons added for automatic segmentation and XML export.*
+
+![Gland segmentation with SAM](docs/img/sam_segmentation.png)
+*Automatic gland segmentation using SAM, saved as ASAP XML annotations.*
+```
+
+Suggested screenshots to include:
+- The ASAP GUI with the **two new buttons highlighted**.  
+- Before vs. after automatic gland segmentation.  
+- XML annotations overlaid in the viewer.  
+
+---
+
+## 📁 Project Structure
+
+```
+ASAP/
+├─ build/                         
+├─ scripts/
+│  ├─ process_svs_and_generate_annotations.py
+│  ├─ detect_glands_fov.py
+│  ├─ detect_glands_unet_fov.py
+│  ├─ config.json
+├─ docs/img/                      # screenshots for the README
+├─ annotations/                   # generated XMLs
+└─ README.md
+```
+
+---
+
+## 📄 License and Credits
+
+- Original **ASAP** project: Computational Pathology Group.  
+- This fork keeps the same license, with additional wrappers and GUI extensions for research and educational purposes.  
+- Segmentation models: **SAM (Meta)** and **U-Net**.  
+
+---
+
+## 🙌 Acknowledgements
+
+Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
