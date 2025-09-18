@@ -109,7 +109,7 @@ python scripts/detect_glands_unet_fov.py \
 
 
 ```markdown
-![New GUI buttons](docs/img/gui_buttons.png)
+![New GUI buttons](docs/img/gui_buttons.jpg)
 *Two new buttons added for automatic segmentation and XML export.*
 
 ![Gland segmentation with SAM](docs/img/sam_segmentation.png)
@@ -151,3 +151,4 @@ ASAP/
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
+
