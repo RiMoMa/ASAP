@@ -83,8 +83,8 @@ Example snippet:
 ```json
 {
   "model": "sam",
-  "sam_checkpoint": "./scripts/sam_vit_h.pth",
-  "unet_checkpoint": "./scripts/best_weight.pth",
+  "sam_checkpoint": "[your path]/scripts/sam_vit_h.pth",
+  "unet_checkpoint": "[your path]/scripts/best_weight.pth",
   "encoder": "resnet34",
   "postprocess": { "min_area": 200, "smooth_kernel": 3 },
   "tiling": { "patch_size": 1024, "overlap": 128 },
@@ -92,7 +92,10 @@ Example snippet:
 }
 ```
 
+> **Note:** Replace `[your path]` with the absolute path to the repository on your system (e.g. `/home/user/ASAP`). Relative paths may fail when running the GUI from other directories.
+
 ---
+
 
 ### 2. Process a folder of `.svs` files with SAM
 
@@ -175,4 +178,5 @@ ASAP/
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
+
 
