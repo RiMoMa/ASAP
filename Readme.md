@@ -31,6 +31,21 @@ This repository is a fork of the original **ASAP (Automated Slide Analysis Platf
 
 ---
 
+---
+
+## ⚙️ Python Environment Setup
+
+It is recommended to use a dedicated conda environment. An environment specification is provided in `scripts/enviromentUnet.yml`.
+
+```bash
+conda env create -f enviromentUnet.yml -n gastro2025UNET
+conda activate gastro2025UNET
+```
+
+This environment includes Python 3.11, OpenSlide, PyTorch, and other dependencies needed for SAM and U‑Net wrappers【gastro2025UNET】.
+
+---
+
 ## ⚙️ Build Instructions (Linux)
 
 This fork was tested with **Ubuntu 20.04+** and **OpenSlide**.
@@ -178,5 +193,6 @@ ASAP/
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
+
 
 
