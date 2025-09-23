@@ -130,13 +130,21 @@ python scripts/detect_glands_unet_fov.py \
 
 ## 🖼️ Screenshots / Examples
 
-\
+
+![New GUI buttons](docs/img/gui_buttons.jpg)
 *Two new buttons added for automatic segmentation and XML export.*
 
-\
+![Gland segmentation with SAM](docs/img/sam_segmentation.png)
 *Automatic gland segmentation using SAM, saved as ASAP XML annotations.*
 
+
+Suggested screenshots to include:
+- The ASAP GUI with the **two new buttons highlighted**.  
+- Before vs. after automatic gland segmentation.  
+- XML annotations overlaid in the viewer.  
+
 ---
+
 
 ## 📁 Project Structure
 
@@ -167,3 +175,4 @@ ASAP/
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
+
