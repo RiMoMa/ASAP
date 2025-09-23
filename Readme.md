@@ -13,7 +13,11 @@ This repository is a fork of the original **ASAP (Automated Slide Analysis Platf
 
   - Run automatic segmentation on the current WSI.
   - Save results directly into ASAP-compatible `.xml` annotations.
-
+    
+ - **Other Functions**:
+    
+  - New shortcut: delete annotations with Ctrl+d after selecting them in the viewer
+  - Focus in the selected region
 - **Python wrappers for AI models**:
 
   - `process_svs_and_generate_annotations.py`: batch segmentation of all `.svs` slides in a directory using **Segment Anything (SAM)**.
@@ -193,6 +197,7 @@ ASAP/
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
+
 
 
 
