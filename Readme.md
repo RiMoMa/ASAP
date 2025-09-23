@@ -2,7 +2,7 @@
 
 This repository is a fork of the original **ASAP (Automated Slide Analysis Platform)**, extended with new functionality to simplify **automatic segmentation of glands in whole-slide images (WSI)** using **AI models (SAM and U-Net)**.
 
-👉 Original repo: [computationalpathologygroup/ASAP](https://github.com/computationalpathologygroup/ASAP)  
+👉 Original repo: [computationalpathologygroup/ASAP](https://github.com/computationalpathologygroup/ASAP)\
 👉 This fork: [RiMoMa/ASAP](https://github.com/RiMoMa/ASAP)
 
 ---
@@ -10,20 +10,24 @@ This repository is a fork of the original **ASAP (Automated Slide Analysis Platf
 ## ✨ Key contributions in this fork
 
 - **Two new buttons added to the GUI**:
-  - Run automatic segmentation on the current WSI.  
-  - Save results directly into ASAP-compatible `.xml` annotations.  
+
+  - Run automatic segmentation on the current WSI.
+  - Save results directly into ASAP-compatible `.xml` annotations.
 
 - **Python wrappers for AI models**:
-  - `process_svs_and_generate_annotations.py`: batch segmentation of all `.svs` slides in a directory using **Segment Anything (SAM)**.  
-  - `detect_glands_fov.py`: apply **SAM** on a single field of view (FOV).  
-  - `detect_glands_unet_fov.py`: apply **U-Net** on a single FOV.  
+
+  - `process_svs_and_generate_annotations.py`: batch segmentation of all `.svs` slides in a directory using **Segment Anything (SAM)**.
+  - `detect_glands_fov.py`: apply **SAM** on a single field of view (FOV).
+  - `detect_glands_unet_fov.py`: apply **U-Net** on a single FOV.
 
 - **Centralized configuration** via `scripts/config.json`:
-  - Model checkpoints, encoder choice, tiling, thresholds, and postprocessing can be easily adjusted.  
+
+  - Model checkpoints, encoder choice, tiling, thresholds, and postprocessing can be easily adjusted.
 
 - **ASAP XML integration**:
-  - Segmentation results are stored as ASAP-readable `.xml` files.  
-  - With `--show`, annotations accumulate visually in the viewer while the XML is updated after each run.  
+
+  - Segmentation results are stored as ASAP-readable `.xml` files.
+  - With `--show`, annotations accumulate visually in the viewer while the XML is updated after each run.
 
 ---
 
@@ -51,6 +55,25 @@ sudo make install
 
 ---
 
+## ⬇️ Download Model Checkpoints
+
+Before running the wrappers, download the required checkpoints (SAM and U-Net).\
+A helper script is provided:
+
+```bash
+chmod +x scripts/download_checkpoints.sh
+./scripts/download_checkpoints.sh
+```
+
+This will fetch the files into `./scripts/`:
+
+- `scripts/sam_vit_h.pth`
+- `scripts/best_weight.pth`
+
+These paths are already referenced in `scripts/config.json`.
+
+---
+
 ## 🚀 Usage of the Wrappers
 
 ### 1. Configure `scripts/config.json`
@@ -60,8 +83,8 @@ Example snippet:
 ```json
 {
   "model": "sam",
-  "sam_checkpoint": "/path/to/sam_vit_h.pth",
-  "unet_checkpoint": "/path/to/unet_glands.ckpt",
+  "sam_checkpoint": "./scripts/sam_vit_h.pth",
+  "unet_checkpoint": "./scripts/best_weight.pth",
   "encoder": "resnet34",
   "postprocess": { "min_area": 200, "smooth_kernel": 3 },
   "tiling": { "patch_size": 1024, "overlap": 128 },
@@ -107,18 +130,11 @@ python scripts/detect_glands_unet_fov.py \
 
 ## 🖼️ Screenshots / Examples
 
-
-![New GUI buttons](docs/img/gui_buttons.jpg)
+\
 *Two new buttons added for automatic segmentation and XML export.*
 
-![Gland segmentation with SAM](docs/img/sam_segmentation.png)
+\
 *Automatic gland segmentation using SAM, saved as ASAP XML annotations.*
-
-
-Suggested screenshots to include:
-- The ASAP GUI with the **two new buttons highlighted**.  
-- Before vs. after automatic gland segmentation.  
-- XML annotations overlaid in the viewer.  
 
 ---
 
@@ -132,6 +148,7 @@ ASAP/
 │  ├─ detect_glands_fov.py
 │  ├─ detect_glands_unet_fov.py
 │  ├─ config.json
+│  ├─ download_checkpoints.sh
 ├─ docs/img/                      # screenshots for the README
 ├─ annotations/                   # generated XMLs
 └─ README.md
@@ -141,17 +158,12 @@ ASAP/
 
 ## 📄 License and Credits
 
-- Original **ASAP** project: Computational Pathology Group.  
-- This fork keeps the same license, with additional wrappers and GUI extensions for research and educational purposes.  
-- Segmentation models: **SAM (Meta)** and **U-Net**.  
+- Original **ASAP** project: Computational Pathology Group.
+- This fork keeps the same license, with additional wrappers and GUI extensions for research and educational purposes.
+- Segmentation models: **SAM (Meta)** and **U-Net**.
 
 ---
 
 ## 🙌 Acknowledgements
 
 Thanks to the ASAP developers and the open-source community for providing the foundation for digital pathology research.
-
-
-
-
-
