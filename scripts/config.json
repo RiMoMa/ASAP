@@ -1,9 +1,9 @@
 {
   "input_path": "./slides",
   "output_path": "./annotations",
-    "sam_checkpoint": "/media/ricardo/bdecafd6-310a-43c1-ab12-59c0202656ee/OpensourceContrib/ASAP/scripts/sam_vit_h.pth",
+    "sam_checkpoint": "./scripts/sam_vit_h.pth",
   "model_type": "vit_h",
-  "unet_checkpoint": "/media/ricardo/bdecafd6-310a-43c1-ab12-59c0202656ee/OpensourceContrib/ASAP/scripts/best_weight.pth",
+  "unet_checkpoint": "./scripts/best_weight.pth",
   "unet_encoder": "resnet18",
   "device": "cuda:0",
   "downsample": 32,
